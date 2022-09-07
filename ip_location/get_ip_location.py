@@ -3,6 +3,7 @@
 # @Author : sanliy
 # @File : get_ip_location
 # @software: PyCharm
+import re
 import IP2Location
 import requests
 
@@ -11,13 +12,28 @@ from tools.c_json import CJson
 
 class getIpLocation:
 
-    def __init__(self, ip_address):
+    def __init__(self, ip_address=None):
         # https://www.ip2location.com/development-libraries/ip2location/python
         # database = IP2Location.IP2Location(os.path.join("data", "IPV6-COUNTRY.BIN"), "SHARED_MEMORY")
         self.database = IP2Location.IP2Location("./IP2LOCATION-LITE-DB5.BIN")
+        if ip_address is None:
+            result, ip_address_local = self.get_ip_address_our_public_net()
+            if result:
+                ip_address = ip_address_local
         self.rec = self.database.get_all(ip_address)
         self.detail_msg = None
         self.cj = CJson()
+
+    @staticmethod
+    def get_ip_address_our_public_net():
+        ip = ''
+        try:
+            res = requests.get('https://myip.ipip.net', timeout=5).text
+            ip = re.findall(r'(\d+\.\d+\.\d+\.\d+)', res)
+            ip = ip[0] if ip else ''
+        except Exception as error:
+            return False, error
+        return True, ip
 
     def get_city_piny(self):
         """
@@ -99,7 +115,7 @@ class getIpLocation:
 
 
 if __name__ == '__main__':
-    gip = getIpLocation("117.61.17.9")
+    gip = getIpLocation()
     print(gip.get_city_piny())
     print(gip.get_region_piny())
     print(gip.get_country_short_en())

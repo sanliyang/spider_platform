@@ -21,7 +21,6 @@ class submit_order:
     def get_chart_count(self, headers, json):
         response_chart_count = requests.post(self.shopping_url, headers=headers, json=json)
         caculate_date = CTime.get_date()
-        # caculate_date = "2022-06-07"
         chart_count = 0
         if response_chart_count.status_code == 200:
             self.logger.info("正在获取[{0}]购物车中订单数量...".format(caculate_date))
