@@ -57,10 +57,10 @@ class get_voucher:
         base_headers = self.get_base_headers()
         response = requests.post(self.login_url_cookie, data=data, headers=base_headers)
         if response.status_code == 200:
-            self.logger.info("[{}]用户登录获取cookie成功...".format(self.username))
+            self.logger.info("[{0}]用户登录获取cookie成功...".format(self.username))
             return response
         else:
-            self.logger.error("[{}]用户登录获取cookie失败...".format(self.username))
+            self.logger.error("[{0}]用户登录获取cookie失败...".format(self.username))
 
     def req_login_token(self, cookie):
         """
@@ -79,10 +79,10 @@ class get_voucher:
         header = self.add_header(base_header, add_header)
         response = requests.post(self.login_url_token, data=data, headers=header)
         if response.status_code == 200:
-            self.logger.info("[{}]用户登录获取token和cookie成功...".format(self.username))
+            self.logger.info("[{0}]用户登录获取token和cookie成功...".format(self.username))
             return response
         else:
-            self.logger.error("[{}]用户登录获取token和cookie失败...".format(self.username))
+            self.logger.error("[{0}]用户登录获取token和cookie失败...".format(self.username))
 
     @staticmethod
     def add_header(base_header, add_header):
@@ -110,10 +110,10 @@ class get_voucher:
         headers = self.add_header(base_header, add_headers)
         resp_logout = requests.get(self.logout_url, headers=headers)
         if resp_logout.status_code == 200:
-            self.logger.info("[{}]用户登出成功...".format(self.username))
+            self.logger.info("[{0}]用户登出成功...".format(self.username))
             return resp_logout
         else:
-            self.logger.error("[{}]用户登出失败...".format(self.username))
+            self.logger.error("[{0}]用户登出失败...".format(self.username))
 
 
 if __name__ == '__main__':
