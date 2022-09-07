@@ -4,6 +4,8 @@
 # @File : get_ip_location
 # @software: PyCharm
 import re
+import socket
+
 import IP2Location
 import requests
 
@@ -12,17 +14,30 @@ from tools.c_json import CJson
 
 class getIpLocation:
 
-    def __init__(self, ip_address=None):
+    def __init__(self, ip_address=None, url=None):
         # https://www.ip2location.com/development-libraries/ip2location/python
         # database = IP2Location.IP2Location(os.path.join("data", "IPV6-COUNTRY.BIN"), "SHARED_MEMORY")
         self.database = IP2Location.IP2Location("./IP2LOCATION-LITE-DB5.BIN")
-        if ip_address is None:
+        if ip_address is None and url is None:
             result, ip_address_local = self.get_ip_address_our_public_net()
             if result:
                 ip_address = ip_address_local
+        if url is not None:
+            result, ip_url = self.switch_domain_2_ip(url)
+            if result:
+                ip_address = ip_url
         self.rec = self.database.get_all(ip_address)
         self.detail_msg = None
         self.cj = CJson()
+
+    @staticmethod
+    def switch_domain_2_ip(url):
+        try:
+            res = socket.getaddrinfo(url, None)
+            ip = res[0][4][0]
+            return True, ip
+        except Exception as error:
+            return False, None
 
     @staticmethod
     def get_ip_address_our_public_net():
@@ -87,7 +102,7 @@ class getIpLocation:
         """
         response = requests.get(
             url="https://api.map.baidu.com/reverse_geocoding/v3/?ak={0}&output=json&coordtype=wgs84ll&location={1},{2}".
-                format(baidu_ak, lat, lon)
+            format(baidu_ak, lat, lon)
         )
         if response.status_code == 200:
             self.detail_msg = response.text
@@ -115,7 +130,7 @@ class getIpLocation:
 
 
 if __name__ == '__main__':
-    gip = getIpLocation()
+    gip = getIpLocation(url="www.baidu.com")
     print(gip.get_city_piny())
     print(gip.get_region_piny())
     print(gip.get_country_short_en())
