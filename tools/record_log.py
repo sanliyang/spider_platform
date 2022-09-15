@@ -48,7 +48,7 @@ class recordLog:
 
     def __init__(self):
         self.__now_time = CTime.get_date()  # 当前日期格式化
-        self.__all_log_path = CFile.path_join(log_path, str(self.__now_time) + ".log")  # 收集所有日志信息文件
+        self.__all_log_path = CFile.path_join(log_path, f"{str(self.__now_time)}.log")
         self.__logger = logging.getLogger()  # 创建日志记录器
         self.__logger.setLevel(logging.DEBUG)  # 设置默认日志记录器记录级别
 
@@ -59,20 +59,12 @@ class recordLog:
         :param log_all_path: 日志文件路径
         :return: 日志记录器
         """
-        # 写入文件，如果文件超过30M大小时，切割日志文件，仅保留3个文件
-        logger_handler = RotatingFileHandler(
-                                                filename=log_all_path,
-                                                maxBytes=30 * 1024 * 1024,
-                                                backupCount=3,
-                                                encoding='utf-8'
-                                            )
-        return logger_handler
+        return RotatingFileHandler(filename=log_all_path, maxBytes=30 * 1024 * 1024, backupCount=3, encoding='utf-8')
 
     @staticmethod
     def __init_console_handle():
         """创建终端日志记录器handler，用于输出到控制台"""
-        console_handle = colorlog.StreamHandler()
-        return console_handle
+        return colorlog.StreamHandler()
 
     def __set_log_handler(self, logger_handler, level=logging.DEBUG):
         """

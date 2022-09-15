@@ -57,13 +57,11 @@ class submit_order_process:
 
     @staticmethod
     def get_query_header(gv_token_dict, cookie):
-        # 获取检索所需要的headers信息
-        add_headers = {
+        return {
             "Cookie": cookie,
             "authorization": gv_token_dict.get("data").get("token"),
             "prical": gv_token_dict.get("data").get("username")
         }
-        return add_headers
 
     @staticmethod
     def get_add_cart_data(response_query):
@@ -74,16 +72,8 @@ class submit_order_process:
         records = query_text_dict.get("result").get("records")
         if records is None:
             return False
-        objectids = []
-        for record in records:
-            objectids.append(record.get("id"))
-        if not objectids:
-            return False
-        formdata = {
-            "metaList": records,
-            "objectids": objectids
-        }
-        return formdata
+        objectids = [record.get("id") for record in records]
+        return {"metaList": records, "objectids": objectids} if objectids else False
 
     def get_order_msg(self) -> list:
         order_all_row = self.csa.fetchall(
@@ -173,8 +163,8 @@ class submit_order_process:
                 sensor = order_product_dict.get("sensor")
                 satellite = order_product_dict.get("satellite")
                 productlevels = order_product_dict.get("productlevels")
-                satelliteSensor_one = satellite + "_" + sensor
-                ssSublevel_one = satelliteSensor_one + "_" + productlevels
+                satelliteSensor_one = f"{satellite}_{sensor}"
+                ssSublevel_one = f"{satelliteSensor_one}_{productlevels}"
                 satelliteSensor = [satelliteSensor_one]
                 ssSublevel = [ssSublevel_one]
                 # 1.0.1 检索之前，首先判断今日是否有订购的余量
@@ -203,7 +193,7 @@ class submit_order_process:
                     submit_productIds = productIds[:day_free:]
                     productIds_lave = list(set(productIds) - set(submit_productIds))
                     productIds = submit_productIds
-                    if len(productIds_lave) > 0:
+                    if productIds_lave:
                         # 这里将不用于提交的产品号回溯到表中
                         backtract_result = self.backtract_2_db_order_z(
                             productIds_lave,
@@ -268,59 +258,51 @@ class submit_order_process:
                                     "id": order_id
                                 }
                             )
-                            update_ac_order_result = csa.execute(
-                                '''
+                            if update_ac_order_result := csa.execute('''
                                 update ac_order set issubmit = :issubmit where id = :id
-                                ''',
-                                {
-                                    "issubmit": 1,
-                                    "id": order_id
-                                }
-                            )
-                            if update_ac_order_result:
+                                ''', {
+                                "issubmit": 1,
+                                "id": order_id
+                            }):
                                 self.logger.info("订单[{0}]在ac_order表中的订单状态更新成功...".format(order_id))
                             else:
-                                self.logger.error("订单[{0}]在ac_order表中的订单状态更新失败，请检查重试...".format(order_id))
-                        except:
-                            update_ac_order_z_result = csa.execute(
-                                '''
+                                self.logger.error(
+                                    "订单[{0}]在ac_order表中的订单状态更新失败，请检查重试...".format(order_id)
+                                )
+                        except Exception:
+                            if update_ac_order_z_result := csa.execute('''
                                 update ac_order_z set issubmit = :issubmit where id = :id
-                                ''',
-                                {
-                                    "issubmit": 1,
-                                    "id": order_id
-                                }
-                            )
-                            if update_ac_order_z_result:
+                                ''', {
+                                "issubmit": 1,
+                                "id": order_id
+                            }):
                                 self.logger.info("订单[{0}]在ac_order_z表中的订单状态更新成功...".format(order_id))
                             else:
-                                self.logger.error("订单[{0}]在ac_order_z表中的订单状态更新失败，请检查重试...".format(order_id))
+                                self.logger.error(
+                                    "订单[{0}]在ac_order_z表中的订单状态更新失败，请检查重试...".format(order_id)
+                                )
                         finally:
                             # 在这里进行对数据表 ac_order_submit_data进行回写
                             for productId in productIds:
-                                insert_into_ac_order_submit_data_result = csa.execute(
-                                    '''
+                                if insert_into_ac_order_submit_data_result := csa.execute('''
                                     insert into ac_order_submit_data 
                                     (id, satellite, sensor, productid, status, 
                                     isdownload, remark, addtime, updatetime, orderid) 
                                     VALUES 
                                     (:id, :satellite, :sensor, :productid, :status, 
                                     :isdownload, :remark, :addtime, :updatetime, :orderid)
-                                    ''',
-                                    {
-                                        "id": uuid.uuid4().hex,
-                                        "satellite": satellite,
-                                        "sensor": sensor,
-                                        "productid": productId,
-                                        "status": 0,
-                                        "isdownload": 0,
-                                        "remark": "已提交",
-                                        "addtime": CTime.get_now_time(),
-                                        "updatetime": CTime.get_now_time(),
-                                        "orderid": order_id
-                                    }
-                                )
-                                if insert_into_ac_order_submit_data_result:
+                                    ''', {
+                                    "id": uuid.uuid4().hex,
+                                    "satellite": satellite,
+                                    "sensor": sensor,
+                                    "productid": productId,
+                                    "status": 0,
+                                    "isdownload": 0,
+                                    "remark": "已提交",
+                                    "addtime": CTime.get_now_time(),
+                                    "updatetime": CTime.get_now_time(),
+                                    "orderid": order_id
+                                }):
                                     self.logger.info("产品号[{0}]回写到ac_order_submit_data表中成功！".format(
                                         productId
                                     ))

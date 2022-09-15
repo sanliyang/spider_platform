@@ -25,7 +25,7 @@ class CMonitor:
         获取总内存
         :return:
         """
-        return str(round(psutil.virtual_memory().total / (1024.0 * 1024.0 * 1024.0), 2)) + "GB"
+        return f"{str(round(psutil.virtual_memory().total / (1024.0 * 1024.0 * 1024.0), 2))}GB"
 
     @staticmethod
     def get_free_memory():
@@ -33,7 +33,7 @@ class CMonitor:
         获取空闲内存
         :return:
         """
-        return str(round(psutil.virtual_memory().free / (1024.0 * 1024.0 * 1024.0), 2)) + "GB"
+        return f"{str(round(psutil.virtual_memory().free / (1024.0 * 1024.0 * 1024.0), 2))}GB"
 
     @staticmethod
     def user():
@@ -43,8 +43,7 @@ class CMonitor:
         """
         users_count = len(psutil.users())
         user_name = ",".join([u.name for u in psutil.users()])
-        all_users = [users_count, user_name]
-        return all_users
+        return [users_count, user_name]
 
     @staticmethod
     def network():
@@ -55,8 +54,7 @@ class CMonitor:
         net = psutil.net_io_counters()
         bytes_rcvd = '{0:.2f} Mb'.format(net.bytes_sent / 1024 / 1024)  # 网卡接收流量
         bytes_sent = '{0:.2f} Mb'.format(net.bytes_recv / 1024 / 1024)  # 网卡发送流量
-        net_list = [bytes_rcvd, bytes_sent]
-        return net_list
+        return [bytes_rcvd, bytes_sent]
 
 
 if __name__ == '__main__':

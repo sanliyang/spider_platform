@@ -24,7 +24,7 @@ class clearLog:
         # 一周前的日期为: a_week_date
         clear_date = CTime.get_before_day_time(int(CResource.log_clear_time), CResource.log_clear_time_type)
         # 拼接出一周前的日志名称, 然后判断该文件在logs文件夹下是否存在, 如果存在就删除, 如果不存在就继续监控
-        all_name = str(clear_date) + ".log"
+        all_name = f"{str(clear_date)}.log"
         # 获取日志的全路径
         all_name_with_path = CFile.path_join(CResource.project_logs_root_path, all_name)
         self.log.info("正在检查[{0}]是否有日志产生， 如果有就清除....".format(clear_date))

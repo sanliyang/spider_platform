@@ -105,8 +105,7 @@ class CEncrypt:
         :param hash_method: hash算法
         :return:
         """
-        sign_result = rsa.sign(message, private_rsa_key, hash_method)
-        return sign_result
+        return rsa.sign(message, private_rsa_key, hash_method)
 
     def verify(self, message, sign, public_rsa_key):
         """
@@ -117,8 +116,7 @@ class CEncrypt:
         :return:
         """
         try:
-            verify = rsa.verify(message, sign, public_rsa_key)
-            return verify
+            return rsa.verify(message, sign, public_rsa_key)
         except rsa.VerificationError:
             return False
 

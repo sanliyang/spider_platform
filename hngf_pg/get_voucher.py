@@ -28,9 +28,7 @@ class get_voucher:
         self.logger.info("正在对用户密码进行解密...")
         public_rsa_key = r.read_rsa_public_key(CResource.public_path)
         private_rsa_key = r.read_rsa_private_key(CResource.private_path)
-        sign_end = r.verify(password_en_byte, sign_byte, public_rsa_key)
-
-        if sign_end:
+        if sign_end := r.verify(password_en_byte, sign_byte, public_rsa_key):
             end_byte = r.decrypt_with_rsa(password_en_byte, private_rsa_key)
             self.password = bytes.decode(end_byte)
             self.logger.info("用户密码解密成功...")
@@ -39,10 +37,7 @@ class get_voucher:
             self.password = None
 
     def get_base_headers(self):
-        headers = {
-            "User-Agent": self.cg.get_value("tools_requests", "User-Agent")
-        }
-        return headers
+        return {"User-Agent": self.cg.get_value("tools_requests", "User-Agent")}
 
     def req_login_cookie(self):
         """
