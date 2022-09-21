@@ -116,8 +116,7 @@ class getIpLocation:
         :return:
         """
         if self.detail_msg is not None:
-            detail_location = self.cj.json_path_one("result.formatted_address")
-            return detail_location
+            return self.cj.json_path_one("result.formatted_address")
 
     def get_business_circle(self):
         """

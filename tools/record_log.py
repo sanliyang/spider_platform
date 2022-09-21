@@ -33,9 +33,11 @@ log_colors_config = {
 
 default_formats = {
     # 终端输出格式
-    'color_format': '%(log_color)s%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    'color_format': '%(log_color)s%(asctime)s - %(name)s - %(filename)s - [line:%(lineno)d] - [%(funcName)s]- %('
+                    'levelname)s - [日志信息]: %(message)s',
     # 日志输出格式
-    'log_format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s '
+    'log_format': '%(asctime)s - %(name)s - %(filename)s - [line:%(lineno)d] - %(levelname)s - [%(funcName)s] - ['
+                    '日志信息]: %(message)s '
 }
 
 
@@ -140,28 +142,23 @@ class recordLog:
 
     def debug(self, message, *args, **kwargs):
         # 这里使用堆栈信息进行回溯，找到调用
-        s = traceback.extract_stack()
-        message = "[{0}] - [{1}] - [{2}] - [日志信息]:".format(s[1][0], s[1][2], s[1][1]) + message
+        kwargs['stacklevel'] = 3
         self.__console('debug', message, *args, **kwargs)
 
     def info(self, message, *args, **kwargs):
-        s = traceback.extract_stack()
-        message = "[{0}] - [{1}] - [{2}] - [日志信息]:".format(s[1][0], s[1][2], s[1][1]) + message
+        kwargs['stacklevel'] = 3
         self.__console('info', message, *args, **kwargs)
 
     def warning(self, message, *args, **kwargs):
-        s = traceback.extract_stack()
-        message = "[{0}] - [{1}] - [{2}] - [日志信息]:".format(s[1][0], s[1][2], s[1][1]) + message
+        kwargs['stacklevel'] = 3
         self.__console('warning', message, *args, **kwargs)
 
     def error(self, message, *args, **kwargs):
-        s = traceback.extract_stack()
-        message = "[{0}] - [{1}] - [{2}] - [日志信息]:".format(s[1][0], s[1][2], s[1][1]) + message
+        kwargs['stacklevel'] = 3
         self.__console('error', message, *args, **kwargs)
 
     def critical(self, message, *args, **kwargs):
-        s = traceback.extract_stack()
-        message = "[{0}] - [{1}] - [{2}] - [日志信息]:".format(s[1][0], s[1][2], s[1][1]) + message
+        kwargs['stacklevel'] = 3
         self.__console('critical', message, *args, **kwargs)
 
 
