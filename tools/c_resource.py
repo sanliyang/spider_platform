@@ -15,7 +15,7 @@ class CResource:
     # 有关logs和项目路径的信息获取
     Name_Base = "base"
     Name_Logs = "logs"
-    project_root_path = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
+    project_root_path = os.path.dirname(sys.path[0])
     project_base_root_path = CFile.path_join(project_root_path, Name_Base)
     config_path = CFile.path_join(project_root_path, 'cnf', 'config.ini')
     private_path = CFile.path_join(project_root_path, 'cnf', 'private.txt')

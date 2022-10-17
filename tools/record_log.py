@@ -6,8 +6,6 @@
 # @Software : PyCharm
 import logging
 import colorlog
-import traceback
-
 
 from logging.handlers import RotatingFileHandler
 from tools.c_file import CFile
